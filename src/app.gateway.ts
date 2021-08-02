@@ -6,32 +6,16 @@ import {
     WsResponse
 } from '@nestjs/websockets'
 import { Socket } from 'socket.io'
-
-type Message = {
-    userName: string,
-    userId: string,
-    avatar: string,
-    message: string,
-    image: string,
-    date: number
-}
-
-type MessageCall = {
-    messageContent: string,
-    image: string,
-    roomid: string,
-    isPrivate: boolean
-}
+import { Message, MessageCall, Rooms } from './types'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect{
 
     @WebSocketServer() server: any
-    ALL: string = 'All'
     users: Map<string, Array<string>> = new Map() // socket.id => [userName, avatar]
-    rooms: Map<string, Array<string>> = new Map([[this.ALL, []]]) // roomName => [... userIds]
+    rooms: Map<string, Array<string>> = new Map([[Rooms.All, []]]) // roomName => [... userIds]
     privateRooms: Set<string> = new Set()
-    messages: Map<string, Array<string | Message>> = new Map([[this.ALL, []]]) //  roomname => [...Message]
+    messages: Map<string, Array<string | Message>> = new Map([[Rooms.All, []]]) //  roomname => [...Message]
     activeUsers: Set<string> = new Set()
 
     @SubscribeMessage('getUsersList')
@@ -49,10 +33,10 @@ export class AppGateway implements OnGatewayDisconnect{
 
     @SubscribeMessage('newUser')
     newUser(client: Socket, [userName, avatar]: Array<string>): void {
-        const allUsers = [...this.rooms.get(this.ALL), userName]
+        const allUsers = [...this.rooms.get(Rooms.All), userName]
 
         this.users.set(client.id, [userName, avatar])
-        this.rooms.set(this.ALL, allUsers)
+        this.rooms.set(Rooms.All, allUsers)
         this.activeUsers.add(client.id)
         client.broadcast.emit('confirmNewUser', ([userName, client.id, avatar, false]))
         client.emit('confirmNewUser', ([userName, client.id, avatar, true]))
