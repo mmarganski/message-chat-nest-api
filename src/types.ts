@@ -13,6 +13,7 @@ export type MessageCall = {
     roomid: string,
     isPrivate: boolean
 }
+
 export enum Rooms {
     All = 'All'
 }
