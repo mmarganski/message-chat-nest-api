@@ -6,4 +6,5 @@ const bootstrap = async () => {
     app.enableCors()
     await app.listen(3002)
 }
+
 bootstrap()

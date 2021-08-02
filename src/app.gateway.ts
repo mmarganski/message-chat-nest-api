@@ -134,5 +134,4 @@ export class AppGateway implements OnGatewayDisconnect{
 
         return userId
     }
-
 }

@@ -16,4 +16,3 @@ export type MessageCall = {
 export enum Rooms {
     All = 'All'
 }
-
