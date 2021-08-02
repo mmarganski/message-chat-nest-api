@@ -1,4 +1,5 @@
 {
+
   "compilerOptions": {
     "declaration": true,
     "removeComments": true,
@@ -10,7 +11,7 @@
     "incremental": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
-    "module": "es6",
+    //"module": "es6",
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
