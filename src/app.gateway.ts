@@ -5,13 +5,13 @@ import {
     WebSocketServer,
     WsResponse
 } from '@nestjs/websockets'
-import { Socket } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import { Message, MessageCall, Rooms } from './types'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect{
 
-    @WebSocketServer() server: any
+    @WebSocketServer() server: Server
     users: Map<string, Array<string>> = new Map() // socket.id => [userName, avatar]
     rooms: Map<string, Array<string>> = new Map([[Rooms.All, []]]) // roomName => [... userIds]
     privateRooms: Set<string> = new Set()
@@ -19,7 +19,7 @@ export class AppGateway implements OnGatewayDisconnect{
     activeUsers: Set<string> = new Set()
 
     @SubscribeMessage('getUsersList')
-    getUserList(client: Socket): void {
+    getUserList(client: Socket) {
         client.emit('sendUsersList', [...this.users.entries()])
         client.emit('activeUsers', [...this.activeUsers.keys()])
     }
@@ -32,7 +32,7 @@ export class AppGateway implements OnGatewayDisconnect{
     }
 
     @SubscribeMessage('newUser')
-    newUser(client: Socket, [userName, avatar]: Array<string>): void {
+    newUser(client: Socket, [userName, avatar]: Array<string>) {
         const allUsers = [...this.rooms.get(Rooms.All), userName]
 
         this.users.set(client.id, [userName, avatar])
@@ -70,7 +70,6 @@ export class AppGateway implements OnGatewayDisconnect{
 
     @SubscribeMessage('joinPrivateRoom')
     joinPrivateRoom(client: Socket, userId: string): WsResponse {
-
         const roomName = this.getPrivateRoomName(userId, client.id)
 
         if (!this.rooms.has(roomName)) {
@@ -83,8 +82,7 @@ export class AppGateway implements OnGatewayDisconnect{
     }
 
     @SubscribeMessage('sendMessage')
-    sendMessage(client: Socket, messageCall: MessageCall): WsResponse {
-
+    sendMessage(client: Socket, messageCall: MessageCall) {
         const roomid = messageCall.isPrivate
             ? this.getPrivateRoomName(messageCall.roomid, client.id)
             : messageCall.roomid
@@ -99,8 +97,6 @@ export class AppGateway implements OnGatewayDisconnect{
         }
 
         this.server.to(roomid).emit('updateMessage', [newMessage, roomid])
-
-        return { event: '', data: '' }
     }
 
     handleDisconnect(client: Socket) {
