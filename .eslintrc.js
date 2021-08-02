@@ -45,7 +45,7 @@ module.exports = {
     "eqeqeq": ["error"],
     "prefer-template": "error",
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
-    "camelcase": ["error", { allow: [ "en_", "id_", "pl_", "Knt_", "ja_", "ru_" ] }],
+    "camelcase": ["error", { allow: [ "en_", "id_", "pl_", "ja_", "ru_" ] }],
     "no-underscore-dangle": "error",
     "one-var": ["error", "never"],
     "no-unused-expressions": "off",
