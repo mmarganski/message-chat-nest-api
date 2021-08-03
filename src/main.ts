@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import "reflect-metadata"
-import { testDBConnection } from './app.service'
+import { testDBConnection, test } from './app.service'
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule)
@@ -10,4 +10,4 @@ const bootstrap = async () => {
 }
 
 bootstrap()
-testDBConnection()
+test()

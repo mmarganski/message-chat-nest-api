@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Request } from 'express'
-import { createConnection } from 'typeorm'
+import { createConnection, getRepository } from 'typeorm'
+import { User } from './entity/User'
 
 @Injectable()
 export class AppService {
@@ -9,20 +10,28 @@ export class AppService {
     }
 }
 
-export const testDBConnection = () => {
-    // console.log("connection test:")
-    createConnection({
-        type: "mysql",
-        host: "localhost",
-        port: 3307,
-        username: "test",
-        password: "test",
-        database: "testdb",
-        entities: [
-        ],
-        synchronize: true,
-        logging: false
-    }).then(connection => {
-        // console.log("DB connected")
-    }).catch(error => console.log(error))
+export const testDBConnection = async () => {
+    console.log("connection test:")
+    await createConnection()
+    console.log("DB connected")
+
+}
+
+export const test = async () => {
+  const connection  = await createConnection()
+  const user = new User()
+
+  user.userName = 'Hank'
+  user.userId = '12'
+  user.avatar = 'foo'
+  user.isActive = true
+  user.messages = []
+
+  await connection.manager.save(user)
+  const users = await connection.manager.find(User)
+
+  const userRepository = getRepository(User)
+  const user2 = userRepository.create({ userId: '10', userName: 'Bob', avatar: 'bar', isActive: false, messages: [] })
+  await userRepository.save(user2)
+
 }
