@@ -26,10 +26,12 @@
     "@nestjs/platform-express": "8.0.0",
     "@nestjs/platform-socket.io": "8.0.5",
     "@nestjs/websockets": "8.0.5",
-    "socket.io": "4.1.3",
+    "mysql": "2.18.1",
     "reflect-metadata": "0.1.13",
+    "rimraf": "3.0.2",
     "rxjs": "7.2.0",
-    "rimraf": "3.0.2"
+    "socket.io": "4.1.3",
+    "typeorm": "0.2.36"
   },
   "devDependencies": {
     "@nestjs/cli": "8.0.0",
