@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
-import { MessageEntity } from './'
+import { MessageEntity } from './Message.entity'
 
 @Entity({name: 'Room'})
 export class RoomEntity {

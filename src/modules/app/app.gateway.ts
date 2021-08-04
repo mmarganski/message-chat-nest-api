@@ -10,7 +10,7 @@ import { Message, MessageCall, Rooms } from 'types'
 import { AppService } from './app.service'
 
 @WebSocketGateway()
-export class AppGateway implements OnGatewayDisconnect{
+export class AppGateway implements OnGatewayDisconnect {
 
     @WebSocketServer() server: Server
     users: Map<string, Array<string>> = new Map() // socket.id => [userName, avatar]
@@ -107,7 +107,7 @@ export class AppGateway implements OnGatewayDisconnect{
         client.broadcast.emit('activeUsers', [...this.activeUsers.keys()])
     }
 
-    prepareMessage = (messageCall: MessageCall, clientId: string) => {
+    prepareMessage(messageCall: MessageCall, clientId: string) {
         const [currentUserName, userAvatar] = this.users.get(clientId)
         const time = new Date().getTime()
         const newMessage: Message = {
@@ -122,12 +122,13 @@ export class AppGateway implements OnGatewayDisconnect{
         return newMessage
     }
 
-    getPrivateRoomName = (userId: string, clientId: string) =>
-        userId < clientId
+    getPrivateRoomName(userId: string, clientId: string) {
+        return userId < clientId
             ? `${userId} & ${clientId}`
             : `${clientId} & ${userId}`
+    }
 
-    getOtherPrivateRoomUser = (roomName: string, clientId: string) => {
+    getOtherPrivateRoomUser(roomName: string, clientId: string) {
         const userId: string = roomName.replace(`${clientId}`, '')
             .replace(' & ', '')
 

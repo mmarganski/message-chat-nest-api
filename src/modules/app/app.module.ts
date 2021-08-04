@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { Connection, getConnectionOptions } from 'typeorm'
 import { AppService } from './app.service'
 import { AppGateway } from './app.gateway'
-import { Connection, getConnectionOptions } from 'typeorm'
-import { MessageEntity, RoomEntity, UserEntity } from '../../lib/entities'
+import { MessageEntity, RoomEntity, UserEntity } from 'lib/entities'
 
 @Module({
     imports: [
