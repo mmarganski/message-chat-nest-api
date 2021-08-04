@@ -44,7 +44,6 @@ export class AppService {
 
     getRoomByName(roomName: string) {
         return this.roomRepository.findOne({ where: { roomName } })
-
     }
 
     createUser(socketId: string, userName: string, avatar: string) {
