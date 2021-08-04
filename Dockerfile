@@ -5,13 +5,11 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY yarn.lock ./
 
-RUN yarn install --production=false
+RUN yarn install
 
 COPY . .
 
-EXPOSE 3002
-
-RUN npm run build
+RUN yarn run build
 
 FROM node:14.17-alpine as production
 

@@ -1,20 +1,19 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm'
-import { User } from './User'
-import { Message } from './Message'
+import { User, Message } from './index'
 
 @Entity()
 export class Room {
 
-  @PrimaryColumn()
-  roomName: string
+    @PrimaryColumn()
+    roomName: string
 
-  @Column()
-  isPrivate: boolean
+    @Column()
+    isPrivate: boolean
 
-  @OneToMany(() => Message, message => message.roomName)
-  messages: Message[]
+    @OneToMany(() => Message, message => message.roomName)
+    messages: Array<Message>
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  categories: User[]
+    @ManyToMany(() => User)
+    @JoinTable()
+    users: Array<User>
 }

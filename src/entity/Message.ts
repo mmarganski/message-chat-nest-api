@@ -1,26 +1,24 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { User } from './User'
-import { Room } from './Room'
+import { User, Room } from './index'
 
 @Entity()
 export class Message {
 
-  @PrimaryGeneratedColumn()
-  messageId: number
+    @PrimaryGeneratedColumn()
+    messageId: number
 
-  @Column()
-  messageContent: string
+    @Column()
+    messageContent: string
 
-  @Column()
-  isImage: boolean
+    @Column()
+    isImage: boolean
 
-  @Column()
-  date: Date
+    @Column()
+    date: Date
 
-  @ManyToOne(() => User, user => user.messages)
-  userId: string
+    @ManyToOne(() => User, user => user.messages)
+    socketId: string
 
-  @ManyToOne(() => Room, room => room.messages)
-  roomName: string
-
+    @ManyToOne(() => Room, room => room.messages)
+    roomName: string
 }

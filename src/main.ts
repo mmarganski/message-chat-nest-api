@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import "reflect-metadata"
-import { testDBConnection, test } from './app.service'
+import { AppService } from './app.service'
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule)
@@ -9,5 +8,9 @@ const bootstrap = async () => {
     await app.listen(3002)
 }
 
+const init = async () => {
+    const as = new AppService()
+}
+
 bootstrap()
-test()
+init()

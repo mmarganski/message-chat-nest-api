@@ -1,21 +1,21 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
-import { Message } from './Message'
+import { Message } from './index'
 
 @Entity()
 export class User {
 
-  @PrimaryColumn()
-  userId: string
+    @PrimaryColumn()
+    socketId: string
 
-  @Column()
-  userName: string
+    @Column()
+    userName: string
 
-  @Column()
-  avatar: string
+    @Column()
+    avatar: string
 
-  @Column()
-  isActive: boolean
+    @Column()
+    isActive: boolean
 
-  @OneToMany(() => Message, message => message.userId)
-  messages: Message[]
+    @OneToMany(() => Message, message => message.socketId)
+    messages: Array<Message>
 }
