@@ -14,40 +14,40 @@ export class AppService {
         private readonly messageRepository: Repository<MessageEntity>,
     ) {}
 
-    async getUsersList() {
+    getUsersList() {
         return this.userRepository.find({ select: ['socketId', 'userName', 'avatar', 'isActive'] })
     }
 
-    async getRoomNames() {
+    getRoomNames() {
         return this.roomRepository.find({ select: ['roomName'] })
     }
 
-    async getPublicRooms() {
+    getPublicRooms() {
         return this.roomRepository.find({ select: ['roomName'], where: { isPrivate: false } })
     }
 
-    async getUsersByRoomName (roomName: string) {
+    getUsersByRoomName (roomName: string) {
         return this.roomRepository.find({ where: { roomName } })
     }
 
-    async getMessagesByRoomName(roomName: string) {
+    getMessagesByRoomName(roomName: string) {
         return this.messageRepository.find({
             select: ['messageContent', 'isImage', 'date', 'socketId'],
             where: { roomName }
         })
     }
 
-    async getUserBySocketId(socketId: string) {
+    getUserBySocketId(socketId: string) {
         return this.userRepository.findOne({ where: { socketId } })
 
     }
 
-    async getRoomByName(roomName: string) {
+    getRoomByName(roomName: string) {
         return this.roomRepository.findOne({ where: { roomName } })
 
     }
 
-    async createUser(socketId: string, userName: string, avatar: string) {
+    createUser(socketId: string, userName: string, avatar: string) {
         return this.userRepository.save({
             socketId,
             userName,
@@ -56,14 +56,14 @@ export class AppService {
         })
     }
 
-    async createRoom (roomName: string, isPrivate: boolean) {
+    createRoom (roomName: string, isPrivate: boolean) {
         return this.roomRepository.save({
             roomName,
             isPrivate
         })
     }
 
-    async createMessage (messageContent: string, isImage: boolean, date: Date, userId: string, roomName: string) {
+    createMessage (messageContent: string, isImage: boolean, date: Date, userId: string, roomName: string) {
         return this.messageRepository.save({
             messageContent,
             isImage,
@@ -73,7 +73,7 @@ export class AppService {
         })
     }
 
-    async deactivateUser (socketId: string) {
+    deactivateUser (socketId: string) {
         return this.userRepository.update({ socketId },{ isActive: false })
     }
 }
