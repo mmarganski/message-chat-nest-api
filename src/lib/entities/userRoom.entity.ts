@@ -1,9 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
 
-@Entity({ name: 'UserRoom' })
+@Entity({ name: 'userRoom' })
 @Unique(['socketId', 'roomName'])
 export class UserRoomEntity {
-
     @PrimaryGeneratedColumn()
     id: number
 

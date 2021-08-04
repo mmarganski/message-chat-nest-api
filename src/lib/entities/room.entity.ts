@@ -1,9 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
-import { MessageEntity } from './Message.entity'
+import { MessageEntity } from './message.entity'
 
-@Entity({name: 'Room'})
+@Entity({ name: 'room' })
 export class RoomEntity {
-
     @PrimaryColumn()
     roomName: string
 

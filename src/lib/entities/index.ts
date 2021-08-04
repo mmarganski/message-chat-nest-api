@@ -1,4 +1,4 @@
-export { UserEntity } from './User.entity'
-export { RoomEntity } from './Room.entity'
-export { MessageEntity } from './Message.entity'
-export { UserRoomEntity } from './UserRoom.entity'
+export { UserEntity } from './user.entity'
+export { RoomEntity } from './room.entity'
+export { MessageEntity } from './message.entity'
+export { UserRoomEntity } from './userRoom.entity'

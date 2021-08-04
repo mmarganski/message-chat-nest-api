@@ -1,9 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { RoomEntity } from './Room.entity'
+import { RoomEntity } from './room.entity'
 
-@Entity({name: 'Message'})
+@Entity({ name: 'message' })
 export class MessageEntity {
-
     @PrimaryGeneratedColumn()
     messageId: number
 

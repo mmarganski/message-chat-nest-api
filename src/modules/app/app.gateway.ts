@@ -11,7 +11,6 @@ import { AppService } from './app.service'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect {
-
     @WebSocketServer() server: Server
     users: Map<string, Array<string>> = new Map() // socket.id => [userName, avatar]
     rooms: Map<string, Array<string>> = new Map([[Rooms.All, []]]) // roomName => [... userIds]

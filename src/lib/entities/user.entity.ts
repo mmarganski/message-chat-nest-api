@@ -1,8 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm'
 
-@Entity({name: 'User'})
+@Entity({ name: 'user' })
 export class UserEntity {
-
     @PrimaryColumn()
     socketId: string
 
