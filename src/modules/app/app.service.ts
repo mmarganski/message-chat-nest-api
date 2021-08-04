@@ -39,6 +39,7 @@ export class AppService {
 
     getUserBySocketId(socketId: string) {
         return this.userRepository.findOne({ where: { socketId } })
+
     }
 
     getRoomByName(roomName: string) {
