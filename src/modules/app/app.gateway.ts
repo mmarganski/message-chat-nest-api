@@ -6,7 +6,8 @@ import {
     WsResponse
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
-import { Message, MessageCall, Rooms } from './types'
+import { Message, MessageCall, Rooms } from 'types'
+import { AppService } from './app.service'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect{
@@ -17,6 +18,8 @@ export class AppGateway implements OnGatewayDisconnect{
     privateRooms: Set<string> = new Set()
     messages: Map<string, Array<string | Message>> = new Map([[Rooms.All, []]]) //  roomname => [...Message]
     activeUsers: Set<string> = new Set()
+
+    constructor(private readonly appsService: AppService) {}
 
     @SubscribeMessage('getUsersList')
     getUserList(client: Socket) {

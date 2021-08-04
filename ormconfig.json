@@ -7,9 +7,9 @@
   "password": "test",
   "database": "testdb",
   "synchronize": true,
-  "logging": false,
+  "logging": true,
   "entities": [
-    "dist/entity/*.js"
+    "dist/lib/entities/*.js"
   ],
   "subscribers": [
     "dist/subscriber/*.js"

@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { User, Room } from './index'
+import { RoomEntity } from './'
 
-@Entity()
-export class Message {
+@Entity({name: 'Message'})
+export class MessageEntity {
 
     @PrimaryGeneratedColumn()
     messageId: number
@@ -16,9 +16,9 @@ export class Message {
     @Column()
     date: Date
 
-    @ManyToOne(() => User, user => user.messages)
+    @Column()
     socketId: string
 
-    @ManyToOne(() => Room, room => room.messages)
+    @ManyToOne(() => RoomEntity, room => room.messages)
     roomName: string
 }
