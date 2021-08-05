@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { CreateChatMessage } from 'types'
+import { CreateChatMessage, Message } from 'lib/types/common'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
 
 @Injectable()
@@ -36,8 +36,17 @@ export class AppService {
         return this.roomRepository.find({ select: ['roomName'], where: { isPrivate: false } })
     }
 
+    getMessagesByRoomName2(roomName: string) {
+        return this.messageRepository.find({  where: { room: roomName } })
+    }
+
     getMessagesByRoomName(roomName: string) {
-        return this.roomRepository.find({ select: ['messages'], where: { roomName } })
+        return this.userRepository
+            .createQueryBuilder('U')
+            .leftJoinAndSelect(MessageEntity, 'M', 'U.socketId = M.socketId')
+            .select(['U.userName', 'U.socketId', 'U.avatar', 'M.messageText', 'M.image', 'M.date'])
+            .where('UR.roomName = :roomName', { roomName })
+            .getMany()
     }
 
     getUserBySocketId(socketId: string) {
@@ -110,5 +119,20 @@ export class AppService {
             .select('U.socketId')
             .where('UR.roomName = :roomName', { roomName })
             .getMany()
+    }
+
+    async formatMessage(message: MessageEntity) {
+        const user = await this.getUserBySocketId(message.socketId)
+        const newMessage: Message = {
+            userName: user.userName,
+            userId: message.socketId,
+            avatar: user.avatar.toString(),
+            message: message.messageText,
+            image: message.image,
+            date: message.date.getTime()
+
+        }
+
+        return newMessage
     }
 }
