@@ -9,6 +9,6 @@ export class RoomEntity {
     @Column()
     isPrivate: boolean
 
-    @OneToMany(() => MessageEntity, message => message.roomName)
+    @OneToMany(() => MessageEntity, message => message.room)
     messages: Array<MessageEntity>
 }

@@ -19,5 +19,5 @@ export class MessageEntity {
     socketId: string
 
     @ManyToOne(() => RoomEntity, room => room.messages)
-    roomName: string
+    room: RoomEntity
 }
