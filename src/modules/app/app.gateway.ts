@@ -6,17 +6,19 @@ import {
     WsResponse
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
-import { Message, MessageCall, Rooms } from './types'
+import { Message, MessageCall, Rooms } from 'types'
+import { AppService } from './app.service'
 
 @WebSocketGateway()
-export class AppGateway implements OnGatewayDisconnect{
-
+export class AppGateway implements OnGatewayDisconnect {
     @WebSocketServer() server: Server
     users: Map<string, Array<string>> = new Map() // socket.id => [userName, avatar]
     rooms: Map<string, Array<string>> = new Map([[Rooms.All, []]]) // roomName => [... userIds]
     privateRooms: Set<string> = new Set()
     messages: Map<string, Array<string | Message>> = new Map([[Rooms.All, []]]) //  roomname => [...Message]
     activeUsers: Set<string> = new Set()
+
+    constructor(private readonly appsService: AppService) {}
 
     @SubscribeMessage('getUsersList')
     getUserList(client: Socket) {
@@ -83,20 +85,20 @@ export class AppGateway implements OnGatewayDisconnect{
 
     @SubscribeMessage('sendMessage')
     sendMessage(client: Socket, messageCall: MessageCall) {
-        const roomid = messageCall.isPrivate
+        const roomId = messageCall.isPrivate
             ? this.getPrivateRoomName(messageCall.roomid, client.id)
             : messageCall.roomid
 
         const newMessage: Message = this.prepareMessage(messageCall, client.id)
-        this.messages.set(roomid, [...this.messages.get(roomid), newMessage])
+        this.messages.set(roomId, [...this.messages.get(roomId), newMessage])
 
         if (messageCall.isPrivate) {
-            client.emit('updateMessage', [newMessage, this.getOtherPrivateRoomUser(roomid, client.id)])
+            client.emit('updateMessage', [newMessage, this.getOtherPrivateRoomUser(roomId, client.id)])
 
-            return this.server.to(this.getOtherPrivateRoomUser(roomid, client.id)).emit('updateMessage', [newMessage, client.id])
+            return this.server.to(this.getOtherPrivateRoomUser(roomId, client.id)).emit('updateMessage', [newMessage, client.id])
         }
 
-        this.server.to(roomid).emit('updateMessage', [newMessage, roomid])
+        this.server.to(roomId).emit('updateMessage', [newMessage, roomId])
     }
 
     handleDisconnect(client: Socket) {
@@ -104,12 +106,12 @@ export class AppGateway implements OnGatewayDisconnect{
         client.broadcast.emit('activeUsers', [...this.activeUsers.keys()])
     }
 
-    prepareMessage = (messageCall: MessageCall, clientid: string) => {
-        const [currentUserName, userAvatar] = this.users.get(clientid)
+    prepareMessage(messageCall: MessageCall, clientId: string) {
+        const [currentUserName, userAvatar] = this.users.get(clientId)
         const time = new Date().getTime()
         const newMessage: Message = {
             userName: currentUserName,
-            userId: clientid,
+            userId: clientId,
             avatar: userAvatar,
             message: messageCall.messageContent,
             image: messageCall.image,
@@ -119,13 +121,14 @@ export class AppGateway implements OnGatewayDisconnect{
         return newMessage
     }
 
-    getPrivateRoomName = (userId: string, clientid: string) =>
-        `${userId}` < `${clientid}`
-            ? `${userId} & ${clientid}`
-            : `${clientid} & ${userId}`
+    getPrivateRoomName(userId: string, clientId: string) {
+        return userId < clientId
+            ? `${userId} & ${clientId}`
+            : `${clientId} & ${userId}`
+    }
 
-    getOtherPrivateRoomUser = (roomName: string, clientid: string) => {
-        const userId: string = roomName.replace(`${clientid}`, '')
+    getOtherPrivateRoomUser(roomName: string, clientId: string) {
+        const userId: string = roomName.replace(`${clientId}`, '')
             .replace(' & ', '')
 
         return userId
