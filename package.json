@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "rd /s /q .husky && husky install && npx husky add .husky/pre-commit \"yarn lint\" ",
+    "prepare": "rimraf .husky && husky install && husky add .husky/pre-commit \"yarn lint\" ",
     "postinstall": "husky install"
   },
   "dependencies": {

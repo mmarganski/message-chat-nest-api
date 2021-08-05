@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
-import { createQueryBuilder, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
+import { CreateChatMessage } from 'types'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
 
 @Injectable()
@@ -64,14 +65,19 @@ export class AppService {
         })
     }
 
-    async createMessage (messageContent: string, isImage: boolean, date: Date, userId: string, roomName: string) {
-        const currentRoom = await this.roomRepository.findOne({where: { roomName } })
+    async createMessage (message: CreateChatMessage) {
+        const currentRoom = await this.roomRepository
+            .findOne({ where: { roomName: message.roomName } })
+
+        const [messageText, image] = message.isImage
+            ? ['', message.messageContent]
+            : [message.messageContent, '']
 
         return this.messageRepository.save({
-            messageContent,
-            isImage,
-            date,
-            socketId: userId,
+            messageText,
+            image,
+            date: new Date(),
+            socketId: message.socketId,
             room: currentRoom
         })
     }
@@ -87,8 +93,9 @@ export class AppService {
 
     async addUserToRoom (roomName: string, socketId: string) {
         const userRoom = await this.userRoomRepository.findOne({ where: { roomName, socketId } })
-        if (userRoom === undefined) {
-            this.createUserRoom(socketId, roomName)
+
+        if (!userRoom) {
+            await this.createUserRoom(socketId, roomName)
         }
     }
 
@@ -97,10 +104,11 @@ export class AppService {
     }
 
     async getUsersInRoom (roomName: string) {
-        return createQueryBuilder('UserEntity')
-            .leftJoinAndSelect(UserRoomEntity, 'UserRoomEntity', 'UserEntity.socketId = UserRoomEntity.socketId')
-            .select('UserEntity.socketId')
-            .where('UserRoomEntity.roomName = :roomName', { roomName })
+        return this.userRepository
+            .createQueryBuilder('U')
+            .leftJoinAndSelect(UserRoomEntity, 'UR', 'U.socketId = UR.socketId')
+            .select('U.socketId')
+            .where('UR.roomName = :roomName', { roomName })
             .getMany()
     }
 }
