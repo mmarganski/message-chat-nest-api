@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { getConnectionOptions } from 'typeorm'
-import { MessageEntity, RoomEntity, UserEntity } from 'lib/entities'
+import { MessageEntity, RoomEntity, UserEntity, UserRoomEntity } from 'lib/entities'
 import { AppService } from './app.service'
 import { AppGateway } from './app.gateway'
 
@@ -13,7 +13,7 @@ import { AppGateway } from './app.gateway'
                     autoLoadEntities: true,
                 })
         }),
-        TypeOrmModule.forFeature([UserEntity, RoomEntity, MessageEntity])],
+        TypeOrmModule.forFeature([UserEntity, RoomEntity, MessageEntity, UserRoomEntity])],
     controllers: [],
     providers: [AppService, AppGateway]
 })

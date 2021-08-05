@@ -7,10 +7,10 @@ export class MessageEntity {
     messageId: number
 
     @Column()
-    messageContent: string
+    messageText: string
 
-    @Column()
-    isImage: boolean
+    @Column('longblob')
+    image: string
 
     @Column()
     date: Date
@@ -19,5 +19,5 @@ export class MessageEntity {
     socketId: string
 
     @ManyToOne(() => RoomEntity, room => room.messages)
-    roomName: string
+    room: RoomEntity
 }

@@ -17,3 +17,10 @@ export type MessageCall = {
 export enum Rooms {
     All = 'All'
 }
+
+export type CreateChatMessage = {
+    messageContent: string,
+    isImage: boolean,
+    socketId: string,
+    roomName: string
+}
