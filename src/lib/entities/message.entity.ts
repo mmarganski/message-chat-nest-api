@@ -9,7 +9,7 @@ export class MessageEntity {
     @Column()
     messageText: string
 
-    @Column('longblob')
+    @Column()
     image: string
 
     @Column()

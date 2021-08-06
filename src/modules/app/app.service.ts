@@ -18,43 +18,64 @@ export class AppService {
     ) {}
 
     getUsersList() {
-        return this.userRepository.find({ select: ['socketId', 'userName', 'avatar', 'isActive'] })
+        return this.userRepository.find({
+            select: [
+                'socketId',
+                'userName',
+                'avatar',
+                'isActive'
+            ]
+        })
     }
 
     getActiveUsers() {
         return this.userRepository.find({
             select: ['socketId'],
-            where: { isActive: true }
+            where: {
+                isActive: true
+            }
         })
     }
 
     getRoomNames() {
-        return this.roomRepository.find({ select: ['roomName'] })
+        return this.roomRepository
+            .find({
+                select: ['roomName']
+            })
     }
 
     getPublicRooms() {
-        return this.roomRepository.find({ select: ['roomName'], where: { isPrivate: false } })
-    }
-
-    getMessagesByRoomName2(roomName: string) {
-        return this.messageRepository.find({  where: { room: roomName } })
+        return this.roomRepository.find({
+            select: ['roomName'],
+            where: {
+                isPrivate: false
+            }
+        })
     }
 
     getMessagesByRoomName(roomName: string) {
-        return this.userRepository
-            .createQueryBuilder('U')
-            .leftJoinAndSelect(MessageEntity, 'M', 'U.socketId = M.socketId')
-            .select(['U.userName', 'U.socketId', 'U.avatar', 'M.messageText', 'M.image', 'M.date'])
-            .where('UR.roomName = :roomName', { roomName })
-            .getMany()
+        return this.roomRepository.find({
+            select: ['messages'],
+            where: {
+                roomName
+            }
+        })
     }
 
     getUserBySocketId(socketId: string) {
-        return this.userRepository.findOne({ where: { socketId } })
+        return this.userRepository.findOne({
+            where: {
+                socketId
+            }
+        })
     }
 
     getRoomByName(roomName: string) {
-        return this.roomRepository.findOne({ where: { roomName } })
+        return this.roomRepository.findOne({
+            where: {
+                roomName
+            }
+        })
     }
 
     createUser(socketId: string, userName: string, avatar: string) {
@@ -76,15 +97,15 @@ export class AppService {
 
     async createMessage (message: CreateChatMessage) {
         const currentRoom = await this.roomRepository
-            .findOne({ where: { roomName: message.roomName } })
-
-        const [messageText, image] = message.isImage
-            ? ['', message.messageContent]
-            : [message.messageContent, '']
+            .findOne({
+                where: {
+                    roomName: message.roomName
+                }
+            })
 
         return this.messageRepository.save({
-            messageText,
-            image,
+            messageText: message.messageText,
+            image: message.image,
             date: new Date(),
             socketId: message.socketId,
             room: currentRoom
@@ -101,7 +122,12 @@ export class AppService {
     }
 
     async addUserToRoom (roomName: string, socketId: string) {
-        const userRoom = await this.userRoomRepository.findOne({ where: { roomName, socketId } })
+        const userRoom = await this.userRoomRepository.findOne({
+            where: {
+                roomName,
+                socketId
+            }
+        })
 
         if (!userRoom) {
             await this.createUserRoom(socketId, roomName)
@@ -109,7 +135,12 @@ export class AppService {
     }
 
     deactivateUser (socketId: string) {
-        return this.userRepository.update({ socketId },{ isActive: false })
+        return this.userRepository
+            .update({
+                socketId
+            },{
+                isActive: false
+            })
     }
 
     async getUsersInRoom (roomName: string) {
@@ -130,7 +161,6 @@ export class AppService {
             message: message.messageText,
             image: message.image,
             date: message.date.getTime()
-
         }
 
         return newMessage

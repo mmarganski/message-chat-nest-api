@@ -8,7 +8,7 @@ export class UserEntity {
     @Column()
     userName: string
 
-    @Column('longblob')
+    @Column()
     avatar: string
 
     @Column()

@@ -19,8 +19,8 @@ export enum Rooms {
 }
 
 export type CreateChatMessage = {
-    messageContent: string,
-    isImage: boolean,
+    messageText: string,
+    image: string,
     socketId: string,
     roomName: string
 }
