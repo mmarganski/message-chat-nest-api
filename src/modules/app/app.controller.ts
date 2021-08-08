@@ -12,7 +12,7 @@ export class AppController {
             const path = `${process.env.IMAGES_PATH}\\${name}`
             const image = fs.readFileSync(path)
             const fileType = await fromBuffer(image)
-            console.log(fileType.mime)
+
             response
                 .set('Content-Type', fileType?.mime)
                 .send(image)

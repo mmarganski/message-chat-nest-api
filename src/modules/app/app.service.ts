@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { getManager, Repository } from 'typeorm'
 import { CreateChatMessage, Message } from 'lib/types/common'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
 
@@ -53,13 +53,21 @@ export class AppService {
         })
     }
 
-    getMessagesByRoomName(roomName: string) {
-        return this.roomRepository.find({
-            select: ['messages'],
-            where: {
-                roomName
-            }
-        })
+    async getMessagesByRoomName(roomName: string) {
+        const entityManager = getManager()
+        const rawData = await entityManager.query(
+            `SELECT 
+                user.userName, 
+                user.socketId, 
+                user.avatar, 
+                message.messageText, 
+                message.image, 
+                message.date
+            FROM message
+            INNER JOIN user ON message.socketId = user.socketId
+            WHERE message.roomRoomName LIKE '${roomName}'`)
+
+        return rawData
     }
 
     getUserBySocketId(socketId: string) {

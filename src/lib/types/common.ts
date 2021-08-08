@@ -24,3 +24,12 @@ export type CreateChatMessage = {
     socketId: string,
     roomName: string
 }
+
+export type MessageQueryResult = {
+    avatar: string,
+    date: string,
+    image: string,
+    messageText: string,
+    socketId: string,
+    userName: string
+}

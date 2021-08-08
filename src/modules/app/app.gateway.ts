@@ -6,7 +6,7 @@ import {
     WsResponse
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
-import { Message, MessageCall } from 'lib/types/common'
+import { Message, MessageCall, MessageQueryResult } from 'lib/types/common'
 import { AppService } from './app.service'
 
 import * as fs from 'fs'
@@ -75,10 +75,22 @@ export class AppGateway implements OnGatewayDisconnect {
         client.join(roomName)
 
         const messageHistory = await  this.appsService.getMessagesByRoomName(roomName)
-        // const formattedHistory = await messageHistory.map(async message => await this.appsService.formatMessage(message))
-        console.log('HISTORY', roomName, messageHistory)
+        const formattedHistory = messageHistory
+            .map(({
+                messageText,
+                socketId,
+                ... others
+            }: MessageQueryResult) => {
+                const ret = {
+                    message: messageText,
+                    userId: socketId,
+                    ...others
+                }
 
-        return { event: 'messageHistory', data: messageHistory }
+                return ret
+            })
+
+        return { event: 'messageHistory', data: formattedHistory }
     }
 
     @SubscribeMessage('joinPrivateRoom')
@@ -92,14 +104,26 @@ export class AppGateway implements OnGatewayDisconnect {
             await this.appsService.addUserToRoom(roomName, userId)
         }
         const messageHistory = await  this.appsService.getMessagesByRoomName(roomName)
-        // const formattedHistory = await messageHistory.map(message => this.appsService.formatMessage(message))
+        const formattedHistory = messageHistory
+            .map(({
+                messageText,
+                socketId,
+                ... others
+            }: MessageQueryResult) => {
+                const ret = {
+                    message: messageText,
+                    userId: socketId,
+                    ...others
+                }
 
-        return { event: 'messageHistory', data: messageHistory }
+                return ret
+            })
+
+        return { event: 'messageHistory', data: formattedHistory }
     }
 
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, messageCall: MessageCall) {
-
         const imagePath = messageCall.image === ''
             ? ''
             : this.saveImage(messageCall.image, client.id)
@@ -139,14 +163,9 @@ export class AppGateway implements OnGatewayDisconnect {
 
     saveImage(image: string, clientId: string): string{
         const [content, fileType] = this.imageFromBase(image)
-        const imagePath = `
-            ${ process.env.IMAGES_PATH }\\
-            ${ clientId }-
-            ${ Math.random()
-        .toString(36)
-        .substr(2, 16) }.
-            ${ fileType }
-            `
+        const imagePath = `${ process.env.IMAGES_PATH }\\${ clientId }-${Math.random()
+            .toString(36)
+            .substr(2, 16)}.${ fileType }`
             .trim()
 
         fs.writeFile(`${ imagePath }`, content, () => {})
@@ -164,7 +183,9 @@ export class AppGateway implements OnGatewayDisconnect {
 
     async saveUser(socketId: string, avatar: string, userName: string){
         if(avatar.includes('http://localhost')) {
-            return this.appsService.createUser(socketId, userName, avatar)
+            const newAvatarPath = 'http://localhost:3002/images/avatar.png'
+
+            return this.appsService.createUser(socketId, userName, newAvatarPath)
         }
 
         const [content, fileType] = this.imageFromBase(avatar)
