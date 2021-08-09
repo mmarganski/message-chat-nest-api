@@ -53,9 +53,10 @@ export class AppService {
         })
     }
 
-    async getMessagesByRoomName(roomName: string) {
+    getMessagesByRoomName(roomName: string) {
         const entityManager = getManager()
-        const rawData = await entityManager.query(
+
+        return entityManager.query(
             `SELECT 
                 user.userName, 
                 user.socketId, 
@@ -65,9 +66,8 @@ export class AppService {
                 message.date
             FROM message
             INNER JOIN user ON message.socketId = user.socketId
-            WHERE message.roomRoomName LIKE '${roomName}'`)
-
-        return rawData
+            WHERE message.roomRoomName LIKE '${roomName}'
+            ORDER BY message.date ASC`)
     }
 
     getUserBySocketId(socketId: string) {
@@ -120,15 +120,6 @@ export class AppService {
         })
     }
 
-    createUserRoom (socketId: string, roomName: string) {
-        return this.userRoomRepository.save({
-            roomName,
-            socketId,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        })
-    }
-
     async addUserToRoom (roomName: string, socketId: string) {
         const userRoom = await this.userRoomRepository.findOne({
             where: {
@@ -151,15 +142,6 @@ export class AppService {
             })
     }
 
-    async getUsersInRoom (roomName: string) {
-        return this.userRepository
-            .createQueryBuilder('U')
-            .leftJoinAndSelect(UserRoomEntity, 'UR', 'U.socketId = UR.socketId')
-            .select('U.socketId')
-            .where('UR.roomName = :roomName', { roomName })
-            .getMany()
-    }
-
     async formatMessage(message: MessageEntity) {
         const user = await this.getUserBySocketId(message.socketId)
         const newMessage: Message = {
@@ -172,5 +154,14 @@ export class AppService {
         }
 
         return newMessage
+    }
+
+    private async createUserRoom (socketId: string, roomName: string) {
+        return this.userRoomRepository.save({
+            roomName,
+            socketId,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        })
     }
 }

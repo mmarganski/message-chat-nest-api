@@ -6,7 +6,7 @@ export class MessageEntity {
     @PrimaryGeneratedColumn()
     messageId: number
 
-    @Column()
+    @Column({length: 4000})
     messageText: string
 
     @Column()

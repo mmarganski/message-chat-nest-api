@@ -49,7 +49,6 @@ export class AppGateway implements OnGatewayDisconnect {
     async newUser(client: Socket, [userName, avatar]: Array<string>) {
         const user = await this.saveUser(client.id, avatar, userName)
 
-        await this.appsService.addUserToRoom('All', client.id)
         client.broadcast.emit('confirmNewUser', ([user.userName, user.socketId, user.avatar, false]))
         client.emit('confirmNewUser', ([user.userName, user.socketId, user.avatar, true]))
     }
@@ -103,7 +102,7 @@ export class AppGateway implements OnGatewayDisconnect {
             await this.appsService.addUserToRoom(roomName, client.id)
             await this.appsService.addUserToRoom(roomName, userId)
         }
-        const messageHistory = await  this.appsService.getMessagesByRoomName(roomName)
+        const messageHistory = await this.appsService.getMessagesByRoomName(roomName)
         const formattedHistory = messageHistory
             .map(({
                 messageText,
@@ -163,9 +162,9 @@ export class AppGateway implements OnGatewayDisconnect {
 
     saveImage(image: string, clientId: string): string{
         const [content, fileType] = this.imageFromBase(image)
-        const imagePath = `${ process.env.IMAGES_PATH }\\${ clientId }-${Math.random()
+        const imagePath = `${ process.env.IMAGES_PATH }\\${ clientId }-${ Math.random()
             .toString(36)
-            .substr(2, 16)}.${ fileType }`
+            .substr(2, 16) }.${ fileType }`
             .trim()
 
         fs.writeFile(`${ imagePath }`, content, () => {})
