@@ -4,6 +4,7 @@ import { getConnectionOptions } from 'typeorm'
 import { MessageEntity, RoomEntity, UserEntity, UserRoomEntity } from 'lib/entities'
 import { AppService } from './app.service'
 import { AppGateway } from './app.gateway'
+import { AppController } from './app.controller'
 
 @Module({
     imports: [
@@ -13,8 +14,8 @@ import { AppGateway } from './app.gateway'
                     autoLoadEntities: true,
                 })
         }),
-        TypeOrmModule.forFeature([UserEntity, RoomEntity, MessageEntity, UserRoomEntity])],
-    controllers: [],
+        TypeOrmModule.forFeature([UserEntity, RoomEntity, MessageEntity, UserRoomEntity]),],
+    controllers: [AppController],
     providers: [AppService, AppGateway]
 })
 export class AppModule {}

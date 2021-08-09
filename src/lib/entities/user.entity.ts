@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -8,9 +8,15 @@ export class UserEntity {
     @Column()
     userName: string
 
-    @Column('longblob')
+    @Column()
     avatar: string
 
     @Column()
     isActive: boolean
+
+    @CreateDateColumn()
+    createdAt: Date
+
+    @UpdateDateColumn()
+    updatedAt: Date
 }

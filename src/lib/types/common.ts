@@ -4,7 +4,7 @@ export type Message = {
     avatar: string,
     message: string,
     image: string,
-    date: number
+    date: string
 }
 
 export type MessageCall = {
@@ -14,13 +14,9 @@ export type MessageCall = {
     isPrivate: boolean
 }
 
-export enum Rooms {
-    All = 'All'
-}
-
 export type CreateChatMessage = {
-    messageContent: string,
-    isImage: boolean,
+    messageText: string,
+    image: string,
     socketId: string,
     roomName: string
 }

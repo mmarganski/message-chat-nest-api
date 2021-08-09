@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'userRoom' })
 @Unique(['socketId', 'roomName'])
@@ -12,9 +12,9 @@ export class UserRoomEntity {
     @Column()
     roomName: string
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date
 
-    @Column()
+    @UpdateDateColumn()
     updatedAt: Date
 }

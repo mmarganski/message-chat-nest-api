@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { RoomEntity } from './room.entity'
 
 @Entity({ name: 'message' })
@@ -6,17 +6,20 @@ export class MessageEntity {
     @PrimaryGeneratedColumn()
     messageId: number
 
-    @Column()
+    @Column({type: 'text'})
     messageText: string
 
-    @Column('longblob')
+    @Column()
     image: string
 
     @Column()
-    date: Date
-
-    @Column()
     socketId: string
+
+    @CreateDateColumn()
+    createdAt: Date
+
+    @UpdateDateColumn()
+    updatedAt: Date
 
     @ManyToOne(() => RoomEntity, room => room.messages)
     room: RoomEntity
