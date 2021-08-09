@@ -12,9 +12,9 @@ export class UserRoomEntity {
     @Column()
     roomName: string
 
-    @Column()
-    createdAt: Date
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
+    createdAt: string
 
-    @Column()
-    updatedAt: Date
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
+    updatedAt: string
 }

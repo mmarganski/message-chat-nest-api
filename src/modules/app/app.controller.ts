@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res } from '@nestjs/common'
 import { fromBuffer } from 'file-type'
 import { Response } from 'express'
+
 const fs = require('fs')
 
 @Controller('images')
@@ -16,7 +17,7 @@ export class AppController {
             response
                 .set('Content-Type', fileType?.mime)
                 .send(image)
-        } catch(e) {
+        } catch {
             response.sendStatus(404)
         }
     }

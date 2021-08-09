@@ -1,8 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { CreateChatMessage, Message, MessageQueryResult } from 'lib/types/common'
+import { CreateChatMessage, Message } from 'lib/types/common'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
+import { MessageQueryResult } from './dao/queryResults.dao'
 
 @Injectable()
 export class AppService {
@@ -106,7 +107,6 @@ export class AppService {
         return this.messageRepository.save({
             messageText: message.messageText,
             image: message.image,
-            date: new Date(),
             socketId: message.socketId,
             room: currentRoom
         })
@@ -142,7 +142,7 @@ export class AppService {
             avatar: user.avatar.toString(),
             message: message.messageText,
             image: message.image,
-            date: message.date.getTime()
+            date: message.date
         }
 
         return newMessage
@@ -151,9 +151,7 @@ export class AppService {
     private async createUserRoom (socketId: string, roomName: string) {
         return this.userRoomRepository.save({
             roomName,
-            socketId,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            socketId
         })
     }
 }

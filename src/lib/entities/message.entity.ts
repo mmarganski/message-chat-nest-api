@@ -6,14 +6,14 @@ export class MessageEntity {
     @PrimaryGeneratedColumn()
     messageId: number
 
-    @Column({length: 4000})
+    @Column({type: 'text'})
     messageText: string
 
     @Column()
     image: string
 
-    @Column()
-    date: Date
+    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
+    date: string
 
     @Column()
     socketId: string

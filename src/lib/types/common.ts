@@ -4,7 +4,7 @@ export type Message = {
     avatar: string,
     message: string,
     image: string,
-    date: number
+    date: string
 }
 
 export type MessageCall = {
@@ -23,13 +23,4 @@ export type CreateChatMessage = {
     image: string,
     socketId: string,
     roomName: string
-}
-
-export type MessageQueryResult = {
-    avatar: string,
-    date: string,
-    image: string,
-    messageText: string,
-    socketId: string,
-    userName: string
 }

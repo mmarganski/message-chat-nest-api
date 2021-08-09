@@ -5,18 +5,12 @@ import {
     WebSocketServer,
     WsResponse
 } from '@nestjs/websockets'
-import { Server, Socket } from 'socket.io'
-import { Message, MessageCall, MessageQueryResult } from 'lib/types/common'
-import { AppService } from './app.service'
-
 import * as fs from 'fs'
-
-type CreateChatMessage = {
-    messageText: string,
-    image: string,
-    socketId: string,
-    roomName: string
-}
+import { v4 as uuidv4 } from 'uuid'
+import { AppService } from './app.service'
+import { Server, Socket } from 'socket.io'
+import { Message, MessageCall, CreateChatMessage } from 'lib/types/common'
+import { MessageQueryResult } from './dao/queryResults.dao'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect {
@@ -26,11 +20,13 @@ export class AppGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('getUsersList')
     async getUserList(client: Socket) {
-        const users = await this.appsService.getUsersList()
+        const [users, activeUsers] = await Promise.all([
+            this.appsService.getUsersList(),
+            this.appsService.getActiveUsers()
+        ])
         const userNames = users
             .map(({ socketId, userName, avatar }) =>
                 [socketId, [ userName, avatar.toString()]])
-        const activeUsers = await this.appsService.getActiveUsers()
         const activeUserNames = activeUsers.map(({ socketId }) => socketId)
 
         client.emit('sendUsersList', userNames)
@@ -58,7 +54,7 @@ export class AppGateway implements OnGatewayDisconnect {
         const rooms = await this.appsService.getRoomNames()
         const roomNames = rooms.map(({ roomName }) => roomName)
 
-        if(roomNames.includes(roomName)){
+        if(roomNames.includes(roomName)) {
             return null
         }
 
@@ -70,11 +66,14 @@ export class AppGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('joinRoom')
     async joinRoom(client: Socket, roomName: string): Promise<WsResponse> {
-        await this.appsService.addUserToRoom(roomName, client.id)
+        const [, messageHistory]: [any, Array<MessageQueryResult>] = await Promise.all([
+            this.appsService.addUserToRoom(roomName, client.id),
+            this.appsService.getMessagesByRoomName(roomName)
+        ])
+
         client.join(roomName)
 
-        const messageHistory = await  this.appsService.getMessagesByRoomName(roomName)
-        const formattedHistory = messageHistory
+        const formattedHistory: Array<Message> = messageHistory
             .map(({
                 messageText,
                 socketId,
@@ -95,8 +94,10 @@ export class AppGateway implements OnGatewayDisconnect {
 
         if (!room) {
             await this.appsService.createRoom(roomName, true)
-            await this.appsService.addUserToRoom(roomName, client.id)
-            await this.appsService.addUserToRoom(roomName, userId)
+            await Promise.all([
+                this.appsService.addUserToRoom(roomName, client.id),
+                this.appsService.addUserToRoom(roomName, userId)
+            ])
         }
         const messageHistory = await this.appsService.getMessagesByRoomName(roomName)
         const formattedHistory = messageHistory
@@ -115,10 +116,10 @@ export class AppGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, messageCall: MessageCall) {
-        const imagePath = messageCall.image === ''
+        const imagePath = !messageCall.image
             ? ''
             : this.saveImage(messageCall.image, client.id)
-                .replace(`${ process.env.IMAGES_PATH }`, process.env.IMAGES_LOCAL_PATH)
+                .replace(`${process.env.IMAGES_PATH}`, process.env.IMAGES_LOCAL_PATH)
 
         const roomId = messageCall.isPrivate
             ? this.getPrivateRoomName(messageCall.roomid, client.id)
@@ -130,8 +131,8 @@ export class AppGateway implements OnGatewayDisconnect {
             socketId: client.id,
             roomName: roomId
         }
-        const ret = await this.appsService.createMessage(message)
-        const newMessage: Message = await this.appsService.formatMessage(ret)
+        const rawMessage = await this.appsService.createMessage(message)
+        const newMessage: Message = await this.appsService.formatMessage(rawMessage)
 
         if (messageCall.isPrivate) {
             client.emit('updateMessage', [newMessage, this.getOtherPrivateRoomUser(roomId, client.id)])
@@ -154,12 +155,9 @@ export class AppGateway implements OnGatewayDisconnect {
 
     saveImage(image: string, clientId: string): string{
         const [content, fileType] = this.imageFromBase(image)
-        const imagePath = `${ process.env.IMAGES_PATH }\\${ clientId }-${ Math.random()
-            .toString(36)
-            .substr(2, 16) }.${ fileType }`
-            .trim()
+        const imagePath = `${process.env.IMAGES_PATH}\\${uuidv4()}.${fileType}`
 
-        fs.writeFile(`${ imagePath }`, content, () => {})
+        fs.writeFileSync(`${imagePath}`, content)
 
         return imagePath
     }
@@ -173,30 +171,30 @@ export class AppGateway implements OnGatewayDisconnect {
     }
 
     async saveUser(socketId: string, avatar: string, userName: string){
-        if(avatar.includes('http://localhost')) {
-            const newAvatarPath = 'http://localhost:3002/images/avatar.png'
+        if(!avatar.match(/^data:image/)) {
+            const newAvatarPath = process.env.API_URL
 
             return this.appsService.createUser(socketId, userName, newAvatarPath)
         }
 
         const [content, fileType] = this.imageFromBase(avatar)
-        const avatarPath = `${ process.env.IMAGES_PATH }\\${ socketId }.${ fileType }`
-        const avatarLocalPath = `${ process.env.IMAGES_LOCAL_PATH }\\${ socketId }.${ fileType }`
+        const avatarPath = `${process.env.IMAGES_PATH}\\${socketId}.${fileType}`
+        const avatarLocalPath = `${process.env.IMAGES_LOCAL_PATH}\\${socketId}.${fileType}`
 
-        fs.writeFile(avatarPath, content, () => {})
+        fs.writeFileSync(avatarPath, content)
 
         return this.appsService.createUser(socketId, userName, avatarLocalPath)
     }
 
     getPrivateRoomName(userId: string, clientId: string) {
         return userId < clientId
-            ? `${ userId } & ${ clientId }`
-            : `${ clientId } & ${ userId }`
+            ? `${userId} & ${clientId}`
+            : `${clientId} & ${userId}`
     }
 
     getOtherPrivateRoomUser(roomName: string, clientId: string) {
         const userId: string = roomName
-            .replace(`${ clientId }`, '')
+            .replace(`${clientId}`, '')
             .replace(' & ', '')
 
         return userId
