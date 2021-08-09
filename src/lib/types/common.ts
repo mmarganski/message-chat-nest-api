@@ -14,10 +14,6 @@ export type MessageCall = {
     isPrivate: boolean
 }
 
-export enum Rooms {
-    All = 'All'
-}
-
 export type CreateChatMessage = {
     messageText: string,
     image: string,

@@ -7,10 +7,10 @@ import {
 } from '@nestjs/websockets'
 import * as fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'
-import { AppService } from './app.service'
 import { Server, Socket } from 'socket.io'
-import { Message, MessageCall, CreateChatMessage } from 'lib/types/common'
-import { MessageQueryResult } from './dao/queryResults.dao'
+import { Message, MessageCall, CreateChatMessage } from 'lib/types'
+import { AppService } from './app.service'
+import { MessageQueryResult } from './dao'
 
 @WebSocketGateway()
 export class AppGateway implements OnGatewayDisconnect {
@@ -54,7 +54,7 @@ export class AppGateway implements OnGatewayDisconnect {
         const rooms = await this.appsService.getRoomNames()
         const roomNames = rooms.map(({ roomName }) => roomName)
 
-        if(roomNames.includes(roomName)) {
+        if (roomNames.includes(roomName)) {
             return null
         }
 
@@ -118,7 +118,7 @@ export class AppGateway implements OnGatewayDisconnect {
     async sendMessage(client: Socket, messageCall: MessageCall) {
         const imagePath = !messageCall.image
             ? ''
-            : this.saveImage(messageCall.image, client.id)
+            : this.saveImage(messageCall.image)
                 .replace(`${process.env.IMAGES_PATH}`, process.env.IMAGES_LOCAL_PATH)
 
         const roomId = messageCall.isPrivate
@@ -153,7 +153,7 @@ export class AppGateway implements OnGatewayDisconnect {
         return [buff, fileType]
     }
 
-    saveImage(image: string, clientId: string): string{
+    saveImage(image: string): string{
         const [content, fileType] = this.imageFromBase(image)
         const imagePath = `${process.env.IMAGES_PATH}\\${uuidv4()}.${fileType}`
 
@@ -171,7 +171,7 @@ export class AppGateway implements OnGatewayDisconnect {
     }
 
     async saveUser(socketId: string, avatar: string, userName: string){
-        if(!avatar.match(/^data:image/)) {
+        if (!avatar.match(/^data:image/)) {
             const newAvatarPath = process.env.API_URL
 
             return this.appsService.createUser(socketId, userName, newAvatarPath)

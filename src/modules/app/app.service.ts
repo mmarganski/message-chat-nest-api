@@ -1,9 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { CreateChatMessage, Message } from 'lib/types/common'
+import { CreateChatMessage, Message } from 'lib/types'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
-import { MessageQueryResult } from './dao/queryResults.dao'
+import { MessageQueryResult } from './dao'
 
 @Injectable()
 export class AppService {
@@ -142,7 +142,7 @@ export class AppService {
             avatar: user.avatar.toString(),
             message: message.messageText,
             image: message.image,
-            date: message.date
+            date: `${message.date}`
         }
 
         return newMessage

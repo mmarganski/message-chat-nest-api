@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { RoomEntity } from './room.entity'
 
 @Entity({ name: 'message' })
@@ -12,8 +12,8 @@ export class MessageEntity {
     @Column()
     image: string
 
-    @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP'})
-    date: string
+    @CreateDateColumn()
+    date: Date
 
     @Column()
     socketId: string
