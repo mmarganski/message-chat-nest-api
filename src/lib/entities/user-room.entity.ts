@@ -13,8 +13,8 @@ export class UserRoomEntity {
     roomName: string
 
     @CreateDateColumn()
-    createdAt2: Date
+    createdAt: Date
 
     @UpdateDateColumn()
-    updatedAt2: Date
+    updatedAt: Date
 }

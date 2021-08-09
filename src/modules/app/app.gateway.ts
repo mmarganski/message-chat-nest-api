@@ -66,7 +66,7 @@ export class AppGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage('joinRoom')
     async joinRoom(client: Socket, roomName: string): Promise<WsResponse> {
-        const [, messageHistory]: [any, Array<MessageQueryResult>] = await Promise.all([
+        const [, messageHistory] = await Promise.all([
             this.appsService.addUserToRoom(roomName, client.id),
             this.appsService.getMessagesByRoomName(roomName)
         ])
@@ -78,7 +78,7 @@ export class AppGateway implements OnGatewayDisconnect {
                 messageText,
                 socketId,
                 ... others
-            }: MessageQueryResult) => ({
+            }) => ({
                 message: messageText,
                 userId: socketId,
                 ...others
@@ -105,7 +105,7 @@ export class AppGateway implements OnGatewayDisconnect {
                 messageText,
                 socketId,
                 ... others
-            }: MessageQueryResult) => ({
+            }) => ({
                 message: messageText,
                 userId: socketId,
                 ...others
