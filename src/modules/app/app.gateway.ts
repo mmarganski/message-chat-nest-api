@@ -79,15 +79,11 @@ export class AppGateway implements OnGatewayDisconnect {
                 messageText,
                 socketId,
                 ... others
-            }: MessageQueryResult) => {
-                const ret = {
-                    message: messageText,
-                    userId: socketId,
-                    ...others
-                }
-
-                return ret
-            })
+            }: MessageQueryResult) => ({
+                message: messageText,
+                userId: socketId,
+                ...others
+            }))
 
         return { event: 'messageHistory', data: formattedHistory }
     }
@@ -108,15 +104,11 @@ export class AppGateway implements OnGatewayDisconnect {
                 messageText,
                 socketId,
                 ... others
-            }: MessageQueryResult) => {
-                const ret = {
-                    message: messageText,
-                    userId: socketId,
-                    ...others
-                }
-
-                return ret
-            })
+            }: MessageQueryResult) => ({
+                message: messageText,
+                userId: socketId,
+                ...others
+            }))
 
         return { event: 'messageHistory', data: formattedHistory }
     }
@@ -126,7 +118,7 @@ export class AppGateway implements OnGatewayDisconnect {
         const imagePath = messageCall.image === ''
             ? ''
             : this.saveImage(messageCall.image, client.id)
-                .replace(`${ process.env.IMAGES_PATH }`, 'http://localhost:3002/images')
+                .replace(`${ process.env.IMAGES_PATH }`, process.env.IMAGES_LOCAL_PATH)
 
         const roomId = messageCall.isPrivate
             ? this.getPrivateRoomName(messageCall.roomid, client.id)

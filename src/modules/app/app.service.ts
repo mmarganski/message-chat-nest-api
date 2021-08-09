@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
-import { getManager, Repository } from 'typeorm'
-import { CreateChatMessage, Message } from 'lib/types/common'
+import { Repository } from 'typeorm'
+import { CreateChatMessage, Message, MessageQueryResult } from 'lib/types/common'
 import { UserEntity, RoomEntity, MessageEntity, UserRoomEntity } from 'lib/entities'
 
 @Injectable()
@@ -54,20 +54,12 @@ export class AppService {
     }
 
     getMessagesByRoomName(roomName: string) {
-        const entityManager = getManager()
-
-        return entityManager.query(
-            `SELECT 
-                user.userName, 
-                user.socketId, 
-                user.avatar, 
-                message.messageText, 
-                message.image, 
-                message.date
-            FROM message
-            INNER JOIN user ON message.socketId = user.socketId
-            WHERE message.roomRoomName LIKE '${roomName}'
-            ORDER BY message.date ASC`)
+        return this.userRepository
+            .createQueryBuilder('U')
+            .innerJoin(MessageEntity, 'M', 'U.socketId = M.socketId')
+            .select('U.userName, U.socketId, U.avatar, M.messageText, M.image, M.date')
+            .where('M.roomRoomName = :roomName', { roomName })
+            .getRawMany<MessageQueryResult>()
     }
 
     getUserBySocketId(socketId: string) {
